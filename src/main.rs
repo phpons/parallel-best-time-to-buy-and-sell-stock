@@ -1,9 +1,4 @@
-use itertools::Itertools;
-use diam::prelude::*;
 use diam::join;
-use std::collections::HashMap;
-use std::collections::HashSet;
-use rayon::prelude::*;
 use std::cmp;
 use rand::Rng;
 
@@ -81,7 +76,7 @@ fn main() {
     let start = std::time::Instant::now();
     let par_result = par_max_profit(0, end_index, &input.clone());
     println!("Parallel result is: {:?}, took {:?}", par_result.max_profit, start.elapsed());
-    diam::svg("parallel-version.svg", || {
-        par_max_profit(0, end_index, &input.clone());
-    });
+    // diam::svg("parallel-version.svg", || {
+    //     par_max_profit(0, end_index, &input.clone());
+    // });
 }

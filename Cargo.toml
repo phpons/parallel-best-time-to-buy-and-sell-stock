@@ -1,5 +1,5 @@
 [package]
-name = "parallel_iterators"
+name = "best_time_buy_sell_stock"
 version = "0.1.0"
 edition = "2018"
 
