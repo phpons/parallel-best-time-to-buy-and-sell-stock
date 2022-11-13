@@ -24,22 +24,19 @@ struct Stock {
     max_profit: i32,
 }
 
-fn par_max_profit(start_index: usize, end_index: usize, prices: Vec<i32>) -> Stock {
+fn par_max_profit(start_index: usize, end_index: usize, prices: &Vec<i32>) -> Stock {
     if end_index - start_index <= 1 {
         return Stock {
-                low: cmp::min(prices[start_index].clone(), prices[end_index].clone()),
-                high: cmp::max(prices[start_index].clone(), prices[end_index].clone()),
+                low: cmp::min(prices[start_index], prices[end_index]),
+                high: cmp::max(prices[start_index], prices[end_index]),
                 max_profit: 0,
             }
     }
 
     let mid = (start_index + end_index + 1) / 2;
-
-    println!("Mid is {:?}", mid);
-
     let (left_stock, right_stock) = join(
-        || par_max_profit(start_index, mid, prices.clone()),
-        || par_max_profit(mid + 1, end_index, prices.clone()),
+        || par_max_profit(start_index, mid, prices),
+        || par_max_profit(mid + 1, end_index, prices),
     );
 
     let local_low = cmp::min(left_stock.low, right_stock.low);
@@ -57,17 +54,19 @@ fn par_max_profit(start_index: usize, end_index: usize, prices: Vec<i32>) -> Sto
     }
 }
 
-const N: usize = 10_000;
+const N: usize = 100_000_000;
 fn main() {
     let mut rng = rand::thread_rng();
 
-    let input: Vec<i32> = (0..N).map(|_| rng.gen_range(0..100_000_000)).collect();
+    let input: Vec<i32> = (0..N).map(|_| rng.gen_range(0..900_000_000)).collect();
     let end_index = input.len() - 1;
 
-    println!("bom dia {:?}", input);
-
+    // println!("bom dia {:?}", input);
+    let start = std::time::Instant::now();
     let seq_result = seq_max_profit(input.clone());
-    let par_result = par_max_profit(0, end_index, input.clone());
+    println!("Sequential result is: {:?}, took {:?}", seq_result, start.elapsed());
 
-    println!("Max profit is {:?} x {:?}", seq_result, par_result.max_profit);
+    let start = std::time::Instant::now();
+    let par_result = par_max_profit(0, end_index, &input.clone());
+    println!("Parallel result is: {:?}, took {:?}", par_result.max_profit, start.elapsed());
 }
