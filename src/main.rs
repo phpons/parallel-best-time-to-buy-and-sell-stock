@@ -24,23 +24,22 @@ struct Stock {
     max_profit: i32,
 }
 
-fn par_max_profit(s_index: usize, e_index: usize, prices: Vec<i32>) -> Stock {
-    // START_REPLACING
-    if e_index - s_index <= 1 {
+fn par_max_profit(start_index: usize, end_index: usize, prices: Vec<i32>) -> Stock {
+    if end_index - start_index <= 1 {
         return Stock {
-                low: cmp::min(prices[s_index].clone(), prices[e_index].clone()),
-                high: cmp::max(prices[s_index].clone(), prices[e_index].clone()),
+                low: cmp::min(prices[start_index].clone(), prices[end_index].clone()),
+                high: cmp::max(prices[start_index].clone(), prices[end_index].clone()),
                 max_profit: 0,
             }
     }
 
-    let mid = (s_index + e_index + 1) / 2;
+    let mid = (start_index + end_index + 1) / 2;
 
     println!("Mid is {:?}", mid);
 
     let (left_stock, right_stock) = join(
-        || par_max_profit(s_index, mid, prices.clone()),
-        || par_max_profit(mid + 1, e_index, prices.clone()),
+        || par_max_profit(start_index, mid, prices.clone()),
+        || par_max_profit(mid + 1, end_index, prices.clone()),
     );
 
     let local_low = cmp::min(left_stock.low, right_stock.low);
@@ -56,7 +55,6 @@ fn par_max_profit(s_index: usize, e_index: usize, prices: Vec<i32>) -> Stock {
         high: local_high,
         max_profit: local_max_profit
     }
-    // END_COMMENTING
 }
 
 const N: usize = 10_000;
@@ -64,12 +62,12 @@ fn main() {
     let mut rng = rand::thread_rng();
 
     let input: Vec<i32> = (0..N).map(|_| rng.gen_range(0..100_000_000)).collect();
-    let e_index = input.len() - 1;
+    let end_index = input.len() - 1;
 
     println!("bom dia {:?}", input);
 
     let seq_result = seq_max_profit(input.clone());
-    let par_result = par_max_profit(0, e_index, input.clone());
+    let par_result = par_max_profit(0, end_index, input.clone());
 
     println!("Max profit is {:?} x {:?}", seq_result, par_result.max_profit);
 }
