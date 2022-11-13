@@ -9,7 +9,7 @@ The input of the problem is an array containing the prices of a stock over time.
 
 Explanation: the stock can be bought for 1 and sold for 6, resulting in a profit of 5.
 
-## Sequential algorithm evaluation:
+## Sequential algorithm:
 Proposed solution:
 > Go over each element, storing the minimum element found so far and updating the maximum profit so far whenever a new maximum is found. 
 <br>
@@ -25,11 +25,12 @@ The code seen in the image below (and included in this repository) shows the seq
 <p align = "center">
 Fig. 1 - Sequential implementation of the solution in Rust
 </p>
-### Complexity
+
+### Complexity of the sequential algorithm
 As each element of the array is accessed only once, the complexity of the solution is polynomial 𝒪(n).
 
 ------------------
-## Parallel solution:
+## Parallel algorithm:
 The principle behind the parallel solution is the same as the sequential. The solution has to be adjusted to allow for parallel execution, however: 
 
 This is achieved via continuously splitting the Vector in half and then joining the local results found by the algorithm.
@@ -51,13 +52,24 @@ The code for the parallel implementation can be found in the function *par_max_p
 Fig. 2 - Parallel implementation of the solution in Rust
 </p>
 
-### Performance improvements
-The first big performance improvement done in the parallel implementation was to remove all uses of *clone()*. I did not conduct tests extensively with the usage of clone(), but the "cloneless" method seems to be around 1000x faster.
-
-The second improvement was to limit the amount of levels created in the division. When the sub-vector's size is under 1000, the computation is performed sequentially in a helper method.
 ### Complexity
-TBD. Still 𝒪(n) anyway.
+The complexity can be calculated following the master theorem.
 
+At each level, the problem is split into *2 subproblems of size n/2*, with the subproblems being further subdivided in deeper levels. The cost of combining each subproblem's output is constant (just a comparison of max/min).
+
+The relation is:
+> T(n) = 2*T(n/2) + O(1)
+
+In this case, the computation is leaf-heavy, with a = 2 and b = 2.
+The complexity is then Θ(n ^ logb a) = O(n^1) = O(n). 
+
+As we are taking multiple threads into account, the cost would be:
+> C = Work / (#threads) + depth
+
+Assuming 3 threads:
+> C = N / 3 + log2 n 
+
+---------------
 # Results
 ## Testing
 The parallel implementation was tested against the sequential implementation using randomly generated inputs of sizes [100_000, 1_000_000, 100_000_000].
@@ -78,7 +90,16 @@ The parallel implementation was consistently slower than the sequential one in t
 ## Parallel execution
 ![Sequential parallel in Rust](images/diam_svg.png "Rust parallel implementation")  
 <p align = "center">
-Fig.3 - Parallel execution diagram with input = 100k
+Fig. 3 - Parallel execution diagram with input = 100k
 </p>
 
 
+---------------------
+## Conclusion
+As seen in the previous section, the parallel execution is beneficial over its sequential counterpart for large inputs.
+
+To achieve these results, there were also some in-code optimizations to be taken into account:
+### Performance improvements
+The first big performance improvement done in the parallel implementation was to remove all usage of *clone()*. Passing just a reference of the vector instead of repetitively cloning showed a performance improvement of over 100x.
+
+The second improvement was to limit the amount of levels created in the division. When the sub-vector's size is under 1000, the computation is performed sequentially in a helper method.
