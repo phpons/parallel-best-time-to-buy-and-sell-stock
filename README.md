@@ -13,7 +13,6 @@ Explanation: the stock can be bought for 1 and sold for 6, resulting in a profit
 Proposed solution:
 > Go over each element, storing the minimum element found so far and updating the maximum profit so far whenever a new maximum is found. 
 <br>
-<br>
 This guarantees that the lowest low (so far) is always "matched" with the highest possible value in the stock timeline.
 
 Each element has to be checked exactly once to reach the solution with this algorithm. There is no point where it can be interrupted.
@@ -82,6 +81,7 @@ The results of a few test runs with can be seen below:
 | 100_000     | 225.9µs              | 314.5µs            |
 | 1_000_000   | 1.9193ms             | 1.9625ms           |
 | 100_000_000 | 229.2672ms           | 177.6921ms         |
+
 *Note: all runs were done using cargo run --release.*
 
 
